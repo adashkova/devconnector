@@ -4,9 +4,9 @@ const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const User = require('../../models/User');
 const { check, validationResult } = require('express-validator');
 
-const User = require('../../models/User');
 // @route   POST api/users
 // @desc    Register user
 // @access  Public
@@ -71,8 +71,6 @@ router.post(
           res.json({ token });
         }
       );
-
-      // res.send('User registered');
     } catch (error) {
       console.log(error);
       res.status(500).send('Server error');

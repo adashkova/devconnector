@@ -3,9 +3,9 @@ const router = express.Router();
 const Post = require('../../models/Post');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
-const { check, validationResult } = require('express-validator');
 const config = require('config');
 const auth = require('../../middleware/auth');
+const { check, validationResult } = require('express-validator');
 
 // @route   POST api/posts
 // @desc    Create a post
@@ -100,6 +100,7 @@ router.delete('/:post_id', auth, async (req, res) => {
 router.put('/like/:id', auth, async (req, res) => {
   const post = await Post.findById(req.params.id);
   try {
+    
     if (
       post.likes.filter(like => like.user.toString() === req.user.id).length > 0
     ) {
@@ -179,11 +180,15 @@ router.post(
 // @route   DELETE api/posts/comment/:id/:comment_id
 // @desc    Delete comment
 // @access  Private
-router.delete('/comment/:id:comment_id', auth, async (req, res) => {
+router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
+  console.log('delete');
+
   try {
     const post = await Post.findById(req.params.id);
 
-    const comment = post.comments.find(comment => comment.id === req.params.comment_id)
+    const comment = post.comments.find(
+      comment => comment.id === req.params.comment_id
+    );
 
     if (!comment) {
       return res.status(404).json({ msg: 'Comment not found' });
@@ -193,12 +198,12 @@ router.delete('/comment/:id:comment_id', auth, async (req, res) => {
     }
 
     const removeIndex = post.comments.map(comment =>
-      comment.user.toString().indexOf(req.params.id)
+      comment.user.toString().indexOf(req.params.comment_id)
     );
 
-    post.comments.splice(removeIndex, 1)
+    post.comments.splice(removeIndex, 1);
     await post.save();
-   
+
     res.json({ msg: 'Comment was removed' });
   } catch (error) {
     console.error(error.message);

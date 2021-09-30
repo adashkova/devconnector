@@ -4,9 +4,10 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
-const { check, validationResult } = require('express-validator');
+const Post = require('../../models/Post');
 const config = require('config');
 const { response } = require('express');
+const { check, validationResult } = require('express-validator');
 
 // @route   GET api/profile/me
 // @desc    Get current users profile
@@ -104,8 +105,6 @@ router.post(
       console.error(error.message);
       res.status(500).send('Server error!');
     }
-
-    //res.send('Data is resieved');
   }
 );
 // @route   GET api/profile
@@ -150,6 +149,8 @@ router.get('/user/:user_id', async (req, res) => {
 
 router.delete('/', auth, async (req, res) => {
   try {
+    // Remove user posts
+    await Post.deleteMany({ user: req.user.id });
     // Remove profile
     await Profile.findOneAndRemove({ user: req.user.id });
 
@@ -303,7 +304,7 @@ router.delete('/education/:ed_id', auth, async (req, res) => {
 router.get('/github/:username', async (req, res) => {
   try {
     const options = {
-      uri: `Https://api.github.com/users/${
+      uri: `https://api.github.com/users/${
         req.params.username
       }/repos?per_page=5&sort=created:asc&client_id=${config.get(
         'githubClientId'

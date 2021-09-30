@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
 const jwt = require('jsonwebtoken');
-const { check, validationResult } = require('express-validator');
 const config = require('config');
 const bcrypt = require('bcryptjs');
+const { check, validationResult } = require('express-validator');
 
 // @route   GET api/auth
 // @desc    Test route
@@ -14,7 +14,7 @@ router.get('/', auth, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
     res.json(user);
   } catch (error) {
-    console.log(error.message);
+    
     res.send(500).send('Server error');
   }
 });
@@ -28,7 +28,7 @@ router.post(
     check('password', 'Password is required').exists(),
   ],
   async (req, res) => {
-    console.log(req.body);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -64,8 +64,6 @@ router.post(
           res.json({ token });
         }
       );
-
-     // res.send('User registered');
     } catch (error) {
       console.log(error);
       res.status(500).send('Server error');
